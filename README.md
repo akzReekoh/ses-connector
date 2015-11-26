@@ -25,7 +25,7 @@ Other Parameters:
 These parameters are then injected to the plugin from the platform.
 
 ## Sample input data
-
+```
 {
     sender : 'sender@domain.com',
     receiver : ['receiver@domain.com'],
@@ -34,3 +34,4 @@ These parameters are then injected to the plugin from the platform.
     cc : ['cc1@domain.com', 'cc2@domain.com'],
     subject : 'Test email'
 }
+```
