@@ -18,6 +18,7 @@ To configure this plugin, an Amazon AWS account is needed to provide the followi
 4. API Version - AWS API Version to use.
 
 Other Parameters:
+
 1. Default Message - The message message to be sent.
 2. Default Sender - The default sender to be used (please note that this email should be added and verified in AWS SES console).
 3. Default Receiver -  The default receiver in which the email will be sent.
