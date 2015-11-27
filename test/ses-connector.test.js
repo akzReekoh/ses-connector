@@ -41,7 +41,8 @@ describe('Connector', function () {
                         secret_access_key : SECRET_ACCESS_KEY,
                         region : REGION,
                         api_version : API_VERSION,
-                        default_message : 'This is a default message.',
+                        default_message_text : 'This is a default message.',
+                        default_message_html : '<h1>This is a default message.</h1> <a href="http://reekoh.com/">Reekoh Website</a>',
                         default_sender : 'adinglasan@reekoh.com',
                         default_receiver : 'akzdinglasan@gmail.com'
 					}
@@ -59,7 +60,8 @@ describe('Connector', function () {
 				data: {
                     sender : 'adinglasan@reekoh.com',
                     receiver : ['akzdinglasan@gmail.com'],
-                    message : 'This is a test email from AWS SES Connector Plugin.',
+                    message_text : 'This is a test email from AWS SES Connector Plugin.',
+                    message_html : '<h1>This is a test email from AWS SES Connector Plugin.</h1> <a href="http://reekoh.com/">Reekoh Website</a>',
                     bcc : [],
                     cc : [],
                     subject : 'Test email'
