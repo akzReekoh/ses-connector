@@ -13,8 +13,11 @@ platform.on('data', function (data) {
         if(isEmpty(data.receiver))
             data.receiver = [config.default_receiver];
 
-        if(isEmpty(data.message))
-            data.message = config.default_message;
+        if(isEmpty(data.message_html))
+            data.message_html = config.default_message_html;
+
+        if(isEmpty(data.message_text))
+            data.message_text = config.default_message_text;
 
         var params = {
             Destination: {
@@ -25,10 +28,10 @@ platform.on('data', function (data) {
             Message: {
                 Body: {
                     Html: {
-                        Data: data.message
+                        Data: data.message_html
                     },
                     Text: {
-                        Data: data.message
+                        Data: data.message_text
                     }
                 },
                 Subject: {
@@ -64,7 +67,8 @@ platform.once('ready', function (options) {
     var AWS = require('aws-sdk');
 
     config = {
-        default_message : options.default_message,
+        default_message_html : options.default_message_html,
+        default_message_text : options.default_message_text,
         default_sender : options.default_sender,
         default_receiver : options.default_receiver
     };

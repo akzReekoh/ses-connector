@@ -19,9 +19,10 @@ To configure this plugin, an Amazon AWS account is needed to provide the followi
 
 Other Parameters:
 
-1. Default Message - The message message to be sent.
-2. Default Sender - The default sender to be used (please note that this email should be added and verified in AWS SES console).
-3. Default Receiver -  The default receiver in which the email will be sent.
+1. Default HTML Message - The HTML version of the message to be sent (to be used if the email client supports HTML).
+2. Default Text Message - The Text version of the message to be sent (to be used if the email client does not support HTML).
+3. Default Sender - The default sender to be used (please note that this email should be added and verified in AWS SES console).
+4. Default Receiver -  The default receiver in which the email will be sent.
 
 These parameters are then injected to the plugin from the platform.
 
@@ -30,7 +31,8 @@ These parameters are then injected to the plugin from the platform.
 {
     sender : 'sender@domain.com',
     receiver : ['receiver@domain.com'],
-    message : 'This is a test email from AWS SES Connector Plugin.',
+    message_text : 'This is a test email from AWS SES Connector Plugin.',
+    message_html : '<h1>This is a test email from AWS SES Connector Plugin.</h1> <a href="http://reekoh.com/">Reekoh Website</a>',
     bcc : ['bcc1@domain.com', 'bcc2@domain.com'],
     cc : ['cc1@domain.com', 'cc2@domain.com'],
     subject : 'Test email'

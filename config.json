@@ -23,11 +23,17 @@
     "required": true,
     "help": "Please provide your AWS API Version."
   },
-  "default_message":{
-    "label": "Default Message",
+  "default_message_html":{
+    "label": "Default HTML Message",
     "type": "String",
     "required": true,
-    "help": "Please provide your email's default message."
+    "help": "Please provide your email's default HTML message."
+  },
+  "default_message_text":{
+    "label": "Default Text Message",
+    "type": "String",
+    "required": true,
+    "help": "Please provide your email's default Text message."
   },
   "default_sender":{
     "label": "Default Sender",
