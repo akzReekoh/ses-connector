@@ -12,9 +12,12 @@ var cp     = require('child_process'),
 describe('Connector', function () {
 	this.slow(5000);
 
-	after('terminate child process', function () {
+	after('terminate child process', function (done) {
+		this.timeout(7000);
+
         setTimeout(function(){
             connector.kill('SIGKILL');
+			done();
         }, 5000);
 	});
 
@@ -54,7 +57,7 @@ describe('Connector', function () {
 	});
 
 	describe('#data', function (done) {
-		it('should process the data', function () {
+		it('should process the JSON data', function () {
 			connector.send({
 				type: 'data',
 				data: {
@@ -66,6 +69,34 @@ describe('Connector', function () {
                     cc : [],
                     subject : 'Test email'
 				}
+			}, done);
+		});
+	});
+
+	describe('#data', function (done) {
+		it('should process the Array data', function () {
+			connector.send({
+				type: 'data',
+				data: [
+					{
+						sender : 'adinglasan@reekoh.com',
+						receiver : ['akzdinglasan@gmail.com'],
+						message_text : 'This is a test email from AWS SES Connector Plugin.',
+						message_html : '<h1>This is a test email from AWS SES Connector Plugin.</h1> <a href="http://reekoh.com/">Reekoh Website</a>',
+						bcc : [],
+						cc : [],
+						subject : 'Test email'
+					},
+					{
+						sender : 'adinglasan@reekoh.com',
+						receiver : ['akzdinglasan@gmail.com'],
+						message_text : 'This is a test email from AWS SES Connector Plugin.',
+						message_html : '<h1>This is a test email from AWS SES Connector Plugin.</h1> <a href="http://reekoh.com/">Reekoh Website</a>',
+						bcc : [],
+						cc : [],
+						subject : 'Test email'
+					}
+				]
 			}, done);
 		});
 	});
