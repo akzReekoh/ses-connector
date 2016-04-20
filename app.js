@@ -7,7 +7,7 @@ var platform = require('./platform'),
     async = require('async'),
 	config, SES;
 
-let sendData = (data) => {
+let sendData = (data, callback) => {
     if(isEmpty(data.sender))
         data.sender = config.default_sender;
 
@@ -43,26 +43,30 @@ let sendData = (data) => {
     };
 
     SES.sendEmail(params, function(error, response){
-        if(error){
-            console.error(error);
-            platform.handleException(error);
-        }
-        else{
+        if(!error){
             platform.log(JSON.stringify({
                 title: 'AWS SES Email sent.',
                 data: params
             }));
         }
+
+        callback(error);
     });
 };
 
 platform.on('data', function (data) {
     if(isPlainObject(data)){
-        sendData(data);
+        sendData(data, (error) => {
+            console.error(error);
+            platform.handleException(error);
+        });
     }
     else if(isArray(data)){
-        async.each(data, (datum) => {
-            sendData(datum);
+        async.each(data, (datum, done) => {
+            sendData(datum, done);
+        }, (error) => {
+            console.error(error);
+            platform.handleException(error);
         });
     }
     else
