@@ -1,105 +1,107 @@
-'use strict';
+'use strict'
 
-var platform = require('./platform'),
-    isPlainObject = require('lodash.isplainobject'),
-    isEmpty = require('lodash.isempty'),
-    isArray = require('lodash.isarray'),
-    async = require('async'),
-	config, SES;
+let reekoh = require('reekoh')
+let _plugin = new reekoh.plugins.Connector()
+let async = require('async')
+let isArray = require('lodash.isarray')
+let isEmpty = require('lodash.isempty')
+let isPlainObject = require('lodash.isplainobject')
+let SES = null
 
 let sendData = (data, callback) => {
-    if(isEmpty(data.sender))
-        data.sender = config.default_sender;
+  if (isEmpty(data.sender)) {
+    data.sender = _plugin.config.defaultSender
+  }
 
-    if(isEmpty(data.receiver))
-        data.receiver = [config.default_receiver];
+  if (isEmpty(data.receiver)) {
+    data.receiver = [_plugin.config.defaultReceiver]
+  }
 
-    if(isEmpty(data.message_html))
-        data.message_html = config.default_message_html;
+  if (isEmpty(data.messageHtml)) {
+    data.messageHtml = _plugin.config.defaultMessageHtml
+  }
 
-    if(isEmpty(data.message_text))
-        data.message_text = config.default_message_text;
+  if (isEmpty(data.messageText)) {
+    data.messageText = _plugin.config.defaultMessageText
+  }
 
-    var params = {
-        Destination: {
-            BccAddresses: data.bcc,
-            CcAddresses: data.cc,
-            ToAddresses: data.receiver
+  let params = {
+    Destination: {
+      BccAddresses: data.bcc,
+      CcAddresses: data.cc,
+      ToAddresses: data.receiver
+    },
+    Message: {
+      Body: {
+        Html: {
+          Data: data.messageHtml
         },
-        Message: {
-            Body: {
-                Html: {
-                    Data: data.message_html
-                },
-                Text: {
-                    Data: data.message_text
-                }
-            },
-            Subject: {
-                Data: data.subject
-            }
-        },
-        Source: data.sender
-    };
-
-    SES.sendEmail(params, function(error, response){
-        if(!error){
-            platform.log(JSON.stringify({
-                title: 'AWS SES Email sent.',
-                data: params
-            }));
+        Text: {
+          Data: data.messageText
         }
+      },
+      Subject: {
+        Data: data.subject
+      }
+    },
+    Source: data.sender
+  }
 
-        callback(error);
-    });
-};
-
-platform.on('data', function (data) {
-    if(isPlainObject(data)){
-        sendData(data, (error) => {
-            if(error) {
-                console.error(error);
-                platform.handleException(error);
-            }
-        });
+  SES.sendEmail(params, function (error) {
+    if (!error) {
+      _plugin.log(JSON.stringify({
+        title: 'AWS SES Email sent.',
+        data: params
+      }))
     }
-    else if(isArray(data)){
-        async.each(data, (datum, done) => {
-            sendData(datum, done);
-        }, (error) => {
-            if(error) {
-                console.error(error);
-                platform.handleException(error);
-            }
-        });
-    }
-    else
-        platform.handleException(new Error('Invalid data received. Must be a valid Array/JSON Object. Data ' + data));
 
-});
+    callback(error)
+  })
+}
 
-platform.once('close', function () {
-    platform.notifyClose();
-});
+/**
+ * Emitted when device data is received.
+ * This is the event to listen to in order to get real-time data feed from the connected devices.
+ * @param {object} data The data coming from the device represented as JSON Object.
+ */
+_plugin.on('data', (data) => {
+  if (isPlainObject(data)) {
+    sendData(data, (error) => {
+      if (error) {
+        console.error(error)
+        _plugin.logException(error)
+      }
+    })
+  } else if (isArray(data)) {
+    async.each(data, (datum, done) => {
+      sendData(datum, done)
+    }, (error) => {
+      if (error) {
+        console.error(error)
+        _plugin.logException(error)
+      }
+    })
+  } else {
+    _plugin.logException(new Error('Invalid data received. Must be a valid Array/JSON Object. Data ' + data))
+  }
+})
 
-platform.once('ready', function (options) {
-    var AWS = require('aws-sdk');
+/**
+ * Emitted when the platform bootstraps the plugin. The plugin should listen once and execute its init process.
+ */
+_plugin.once('ready', () => {
+  let AWS = require('aws-sdk')
 
-    config = {
-        default_message_html : options.default_message_html,
-        default_message_text : options.default_message_text,
-        default_sender : options.default_sender,
-        default_receiver : options.default_receiver
-    };
+  SES = new AWS.SES({
+    accessKeyId: _plugin.config.accessKeyId,
+    secretAccessKey: _plugin.config.secretAccessKey,
+    region: _plugin.config.region,
+    version: _plugin.config.apiVersion,
+    sslEnabled: true
+  })
 
-    SES = new AWS.SES({
-        accessKeyId: options.access_key_id,
-        secretAccessKey: options.secret_access_key,
-        region: options.region,
-        version: options.api_version,
-        sslEnabled: true
-    });
+  _plugin.log('SES Connector has been initialized.')
+  _plugin.emit('init')
+})
 
-    platform.log('AWS SES Connector Initialized.');
-	platform.notifyReady();
-});
+module.exports = _plugin
